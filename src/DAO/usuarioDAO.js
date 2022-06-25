@@ -110,6 +110,113 @@ async function getTurnos() {
 
 
 
+async function verificarVagasTurnoSetor(id_setor, id_turno) {
+    let retorno = {
+        status: false,
+        msg: '',
+    };
+
+    const db = await oracledb.getConnection();
+    await db.execute(`select * from samel.vagas_turno
+                        where
+                            1 = 1
+                            and id_setor = :id_setor
+                            and id_turno = :id_turno
+                            order by id_vagas_turno desc
+                    `,
+        {
+            ':id_setor': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_setor)},
+            ':id_turno': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_turno)},
+        },
+        { outFormat: oracledb.OBJECT, autoCommit: true },
+    )
+    .then(result => {
+        if(result.rows.length > 0){
+            retorno.status = true;
+            retorno.msg = "Dados encotrados";
+            retorno.dados = result.rows;
+        }else{
+            retorno.status = false;
+            retorno.msg = "Turno setor não cadastrado";
+            retorno.dados = []
+        }
+    })
+    .finally(function() {
+        db.close();
+    })
+    .catch(err => {
+        retorno.msg = "Erro ao buscar vagas";
+    });
+
+    return retorno;
+}
+
+
+
+async function verificarSeusuarioBateuPonto(id_setor, id_turno, cod) {
+    let retorno
+
+    const db = await oracledb.getConnection();
+    await db.execute(`select count(id_profissional) as batidas from samel.registro_ponto 
+                        where 1 = 1
+                            and id_setor = :id_setor
+                            and id_turno = :id_turno
+                            and id_profissional = :cod
+                            and trunc(hora_registro) = trunc(sysdate)
+                    `,
+        {
+            ':id_setor': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_setor)},
+            ':id_turno': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_turno)},
+            ':cod': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(cod)},
+        },
+        { outFormat: oracledb.OBJECT, autoCommit: true },
+    )
+    .then(result => {
+        retorno = result.rows[0].BATIDAS;
+    })
+    .finally(function() {
+        db.close();
+    })
+    .catch(err => {
+        console.log("Erro ao buscar pontos batidos" + err);
+    });
+
+    return retorno
+}
+
+
+
+async function verificarPontosBatidos(id_setor, id_turno) {
+    let retorno
+
+    const db = await oracledb.getConnection();
+    await db.execute(`select count(id_profissional) as batidas from samel.registro_ponto 
+                        where 1 = 1
+                            and id_setor = :id_setor
+                            and id_turno = :id_turno
+                            and trunc(hora_registro) = trunc(sysdate)
+                    `,
+        {
+            ':id_setor': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_setor)},
+            ':id_turno': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_turno)},
+        },
+        { outFormat: oracledb.OBJECT, autoCommit: true },
+    )
+    .then(result => {
+        retorno = result.rows[0].BATIDAS;
+    })
+    .finally(function() {
+        db.close();
+    })
+    .catch(err => {
+        retorno.msg = "Erro ao buscar vagas";
+    });
+
+    return retorno;
+}
+
+
+
 async function registrarPonto(cod, id_setor, id_turno, latitude, longitude, cpf) {
     let retorno = {
         status: false,
@@ -130,7 +237,7 @@ async function registrarPonto(cod, id_setor, id_turno, latitude, longitude, cpf)
             :cod,
             :id_setor,
             :id_turno,
-            sysdate, 
+            sysdate
             )
                     `,
         {
@@ -145,14 +252,14 @@ async function registrarPonto(cod, id_setor, id_turno, latitude, longitude, cpf)
     )
     .then(result => {
         retorno.status = true;
-        retorno.msg = "Usuário encontrado";
+        retorno.msg = "Ponto registrado com sucesso!";
     })
     .finally(function() {
         db.close();
     })
     .catch(err => {
         console.log(err)
-        retorno.msg = "Erro ao registrar ponto";
+        retorno.msg = "Erro ao registrar ponto!";
     });
 
     return retorno;
@@ -165,5 +272,8 @@ module.exports = {
     login,
     getSetores,
     getTurnos,
+    verificarVagasTurnoSetor,
+    verificarSeusuarioBateuPonto,
+    verificarPontosBatidos,
     registrarPonto,
 };
