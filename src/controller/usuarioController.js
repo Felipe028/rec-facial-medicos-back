@@ -67,6 +67,9 @@ const registrarPonto = async (req, res) => {
             return res.status(500).send(retorno);
         }
     }else{
+        if(verificarSeusuarioBateuPonto >= 2){
+            return res.status(200).send({"status": false, "msg": "Você já atingiu o limite máximo de registro de pontos, para esse turno/setor, hoje", "dados": []});
+        }
         //verificar quantas vagas tem p esse turno/setor
         var vagasTurnoSetor = await usuarioDAO.verificarVagasTurnoSetor(id_setor, id_turno);
         var pontosBatidos = await usuarioDAO.verificarPontosBatidos(id_setor, id_turno);
@@ -94,6 +97,5 @@ module.exports = {
     login,
     getSetores,
     getTurnos,
-    verificarVagasTurnoSetor,
     registrarPonto,
 };

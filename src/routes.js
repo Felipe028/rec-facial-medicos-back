@@ -69,8 +69,6 @@ router.get('/getSetores', usuarioController.getSetores);
 
 router.get('/getTurnos', usuarioController.getTurnos);
 
-router.post('/verificarVagasTurnoSetor', usuarioController.verificarVagasTurnoSetor);
-
 router.post('/registrarPonto', authenticate, usuarioController.registrarPonto);
 // >>>>>>>>>>>>>>>>>>>>>>>>>>Novas Rotas<<<<<<<<<<<<<<<<<<<<<<<<<
 
