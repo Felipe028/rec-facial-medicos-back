@@ -1,0 +1,317 @@
+[
+    {
+      "nm_proficional": "teste",
+      "conselho": "CRM",
+      "nm_conselho": "13123",    
+      "lista_exames_laudos": [
+        {
+          "nr_atendimento": "4117211",
+          "dt_atendimento": "16/02/2022",
+          "hr_atendimento": "09:55:32",
+          "nm_paciente": "Maria Alzinete Rodrigues De Oliveira",
+          "ie_sexo": "F",
+          "qtd_idade": 45,
+          "cd_pessoa_fisica ": "162568",
+          "lista_procedimento": [
+            {
+              "cd_procedimento": "41001095",
+              "ie_origem_procedimento": "8",
+              "ds_procedimento": "TC - Abdome total (abdome superior, pelve e retroperitônio)",
+              "ie_status": "L"
+            }
+          ],
+          "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.25833.2.6510&cache=true&r=0"
+        },
+        {
+          "nr_atendimento": "4117485",
+          "dt_atendimento": "16/02/2022",
+          "hr_atendimento": "10:24:31",
+          "nm_paciente": "Misael Gladston De Souza Sena",
+          "ie_sexo": "M",
+          "qtd_idade": 18,
+          "cd_pessoa_fisica ": "640998",
+          "lista_procedimento": [
+            {
+              "cd_procedimento": "41001095",
+              "ie_origem_procedimento": "8",
+              "ds_procedimento": "TC - Abdome total (abdome superior, pelve e retroperitônio)",
+              "ie_status": "L"
+            }
+          ],
+          "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.25987.2.6638&cache=true&r=0"
+        },
+        {
+          "nr_atendimento": "4117901",
+          "dt_atendimento": "16/02/2022",
+          "hr_atendimento": "11:58:08",
+          "nm_paciente": "PAULO ANDRE VIANA FERNANDES",
+          "ie_sexo": "M",
+          "qtd_idade": 45,
+          "cd_pessoa_fisica ": "614478",
+          "lista_procedimento": [
+            {
+              "cd_procedimento": "41001095",
+              "ie_origem_procedimento": "8",
+              "ds_procedimento": "TC - Abdome total (abdome superior, pelve e retroperitônio)",
+              "ie_status": "L"
+            },
+            {
+              "cd_procedimento": "41001079",
+              "ie_origem_procedimento": "8",
+              "ds_procedimento": "TC - Tórax",
+              "ie_status": "L"
+            }
+          ],
+          "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.26152.2.6961&cache=true&r=0"
+        },
+        {
+          "nr_atendimento": "4112357",
+          "dt_atendimento": "15/02/2022",
+          "hr_atendimento": "08:55:41",
+          "nm_paciente": "Juliana De Souza Pena",
+          "ie_sexo": "F",
+          "qtd_idade": 36,
+          "cd_pessoa_fisica ": "571511",
+          "lista_procedimento": [
+            {
+              "cd_procedimento": "41001010",
+              "ie_origem_procedimento": "8",
+              "ds_procedimento": "TC - Crânio ou sela túrcica ou órbitas",
+              "ie_status": "L"
+            }
+          ],
+          "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.24087.2.2342&cache=true&r=0"
+        },
+        {
+          "nr_atendimento": "4111274",
+          "dt_atendimento": "15/02/2022",
+          "hr_atendimento": "05:05:58",
+          "nm_paciente": "Fabio Tapajos Viana",
+          "ie_sexo": "M",
+          "qtd_idade": 45,
+          "cd_pessoa_fisica ": "732693",
+          "lista_procedimento": [
+            {
+              "cd_procedimento": "41001095",
+              "ie_origem_procedimento": "8",
+              "ds_procedimento": "TC - Abdome total (abdome superior, pelve e retroperitônio)",
+              "ie_status": "L"
+            }
+          ],
+          "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.23752.2.1422&cache=true&r=0"
+        },
+        {
+          "nr_atendimento": "4113587",
+          "dt_atendimento": "15/02/2022",
+          "hr_atendimento": "12:03:14",
+          "nm_paciente": "ALDENEY VIANA PIMENTA",
+          "ie_sexo": "M",
+          "qtd_idade": 50,
+          "cd_pessoa_fisica ": "677564",
+          "lista_procedimento": [
+            {
+              "cd_procedimento": "41001095",
+              "ie_origem_procedimento": "8",
+              "ds_procedimento": "TC - Abdome total (abdome superior, pelve e retroperitônio)",
+              "ie_status": "L"
+            }
+          ],
+          "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.24592.2.3267&cache=true&r=0"
+        },
+        {
+          "nr_atendimento": "4113587",
+          "dt_atendimento": "14/02/2022",
+          "hr_atendimento": "10:05:31",
+          "nm_paciente": "Maria Mercedes Dutra De Miranda",
+          "ie_sexo": "F",
+          "qtd_idade": 59,
+          "cd_pessoa_fisica ": "263073",
+          "lista_procedimento": [
+            {
+              "cd_procedimento": "40808041",
+              "ie_origem_procedimento": "8",
+              "ds_procedimento": "Mamografia digital bilateral",
+              "ie_status": "L"
+            }
+          ],
+          "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.22565.2.8961&cache=true&r=0"
+        },
+        {
+          "nr_atendimento": "4112093",
+          "dt_atendimento": "15/02/2022",
+          "hr_atendimento": "08:31:09",
+          "nm_paciente": "Adenilse Araujo Cruz",
+          "ie_sexo": "F",
+          "qtd_idade": 46,
+          "cd_pessoa_fisica ": "745469",
+          "lista_procedimento": [
+            {
+              "cd_procedimento": "40808041",
+              "ie_origem_procedimento": "8",
+              "ds_procedimento": "Mamografia digital bilateral",
+              "ie_status": "L"
+            }
+          ],
+          "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.23984.2.2097&cache=true&r=0"
+        }
+      ] 
+    },
+  
+    {
+      "nm_proficional": "teste 2",
+      "conselho": "CRM",
+      "nm_conselho": "456456",    
+      "lista_exames_laudos": [
+        {
+          "nr_atendimento": "4114442",
+          "dt_atendimento": "15/02/2022",
+          "hr_atendimento": "15:14:20",
+          "nm_paciente": "Andreia Maria Queiroz Azevedo",
+          "ie_sexo": "F",
+          "qtd_idade": 44,
+          "cd_pessoa_fisica ": "704573",
+          "lista_procedimento": [
+            {
+              "cd_procedimento": "4114442",
+              "ie_origem_procedimento": "8",
+              "ds_procedimento": "RX - Tórax - 2 incidências",
+              "ie_status": "L"
+            }
+          ],
+          "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.24790.2.3779&cache=true&r=0"
+        },
+        {
+          "nr_atendimento": "4114442",
+          "dt_atendimento": "15/02/2022",
+          "hr_atendimento": "14:58:20",
+          "nm_paciente": "Geovanna Victoria De Souza Pires",
+          "ie_sexo": "F",
+          "qtd_idade": 19,
+          "cd_pessoa_fisica ": "743295",
+          "lista_procedimento": [
+            {
+              "cd_procedimento": "40805026",
+              "ie_origem_procedimento": "8",
+              "ds_procedimento": "RX - Tórax - 2 incidências",
+              "ie_status": "L"
+            }
+          ],
+          "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.24765.2.3730&cache=true&r=0"
+        }
+      ]
+    },
+      {
+        "nm_proficional": "teste 3",
+        "conselho": "CRM",
+        "nm_conselho": "890890",    
+        "lista_exames_laudos": [
+          {
+            "nr_atendimento": "4119434",
+            "dt_atendimento": "16/02/2022",
+            "hr_atendimento": "16:38:05",
+            "nm_paciente": "Ana Paula Batista Teixeira",
+            "ie_sexo": "F",
+            "qtd_idade": 21,
+            "cd_pessoa_fisica ": "980255",
+            "lista_procedimento": [
+              {
+                "cd_procedimento": "40202038",
+                "ie_origem_procedimento": "8",
+                "ds_procedimento": "Endoscopia digestiva alta com biópsia e/ou citologia",
+                "ie_status": "L"
+              }
+            ],
+            "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.26634.2.7849&cache=true&r=0"
+          },
+          {
+            "nr_atendimento": "4115965",
+            "dt_atendimento": "16/02/2022",
+            "hr_atendimento": "07:50:06",
+            "nm_paciente": "George Coelho Da Cunha",
+            "ie_sexo": "M",
+            "qtd_idade": 65,
+            "cd_pessoa_fisica ": "980255",
+            "lista_procedimento": [
+              {
+                "cd_procedimento": "40201120",
+                "ie_origem_procedimento": "8",
+                "ds_procedimento": "Endoscopia digestiva alta",
+                "ie_status": "L"
+              }
+            ],
+            "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.25437.2.5403&cache=true&r=0"
+          },
+          {
+            "nr_atendimento": "4117304",
+            "dt_atendimento": "16/02/2022",
+            "hr_atendimento": "10:04:35",
+            "nm_paciente": "Derisnei Jose Maria Da Silva",
+            "ie_sexo": "M",
+            "qtd_idade": 65,
+            "cd_pessoa_fisica ": "692479",
+            "lista_procedimento": [
+              {
+                "cd_procedimento": "40202038",
+                "ie_origem_procedimento": "8",
+                "ds_procedimento": "Endoscopia digestiva alta com biópsia e/ou citologia",
+                "ie_status": "L"
+              }
+            ],
+            "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.25768.2.6462&cache=true&r=0"
+          },
+          {
+            "nr_atendimento": "4111575",
+            "dt_atendimento": "15/02/2022",
+            "hr_atendimento": "07:33:14",
+            "nm_paciente": "Ana Natalia Monte",
+            "ie_sexo": "F",
+            "qtd_idade": 36,
+            "cd_pessoa_fisica ": "727218",
+            "lista_procedimento": [
+              {
+                "cd_procedimento": "40202038",
+                "ie_origem_procedimento": "8",
+                "ds_procedimento": "Endoscopia digestiva alta com biópsia e/ou citologia",
+                "ie_status": "L"
+              }
+            ],
+            "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.25437.2.5403&cache=true&r=0"
+          },
+          {
+            "nr_atendimento": "4112458",
+            "dt_atendimento": "15/02/2022",
+            "hr_atendimento": "09:04:02",
+            "nm_paciente": "Antonio Jose Lopes De Souza",
+            "ie_sexo": "M",
+            "qtd_idade": 59,
+            "cd_pessoa_fisica ": "727218",
+            "lista_procedimento": [
+              {
+                "cd_procedimento": "40202038",
+                "ie_origem_procedimento": "8",
+                "ds_procedimento": "Endoscopia digestiva alta com biópsia e/ou citologia",
+                "ie_status": "L"
+              }
+            ],
+            "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.24078.2.2326&cache=true&r=0"
+          },
+          {
+            "nr_atendimento": "4113268",
+            "dt_atendimento": "15/02/2022",
+            "hr_atendimento": "09:04:02",
+            "nm_paciente": "Fatima Pereira da Silva",
+            "ie_sexo": "F",
+            "qtd_idade": 50,
+            "cd_pessoa_fisica ": "565401",
+            "lista_procedimento": [
+              {
+                "cd_procedimento": "40202038",
+                "ie_origem_procedimento": "8",
+                "ds_procedimento": "Endoscopia digestiva alta com biópsia e/ou citologia",
+                "ie_status": "L"
+              }
+            ],
+            "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.24327.2.2875&cache=true&r=0"
+          }
+        ]}
+  ]

@@ -1,0 +1,37 @@
+[{
+    "nr_atendimento": "4119434",
+    "dt_atendimento": "16/02/2022",
+    "hr_atendimento": "16:38:05",
+    "nm_paciente": "Ana Paula Batista Teixeira",
+    "ie_sexo": "F",
+    "qtd_idade": 21,
+    "cd_pessoa_fisica ": "980255",
+    "lista_procedimento": [
+      {
+        "cd_procedimento": "40202038",
+        "ie_origem_procedimento": "8",
+        "ds_procedimento": "Endoscopia digestiva alta com biópsia e/ou citologia",
+        "ie_status": "L"
+      }
+    ],
+    "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.26634.2.7849&cache=true&r=0"
+  },
+  {
+    "nr_atendimento": "4119434",
+    "dt_atendimento": "16/02/2022",
+    "hr_atendimento": "16:38:05",
+    "nm_paciente": "Ana Paula Batista Teixeira",
+    "ie_sexo": "F",
+    "qtd_idade": 21,
+    "cd_pessoa_fisica ": "980255",
+    "lista_procedimento": [
+      {
+        "cd_procedimento": "40202038",
+        "ie_origem_procedimento": "8",
+        "ds_procedimento": "Endoscopia digestiva alta com biópsia e/ou citologia",
+        "ie_status": "L"
+      }
+    ],
+    "link_exame_imagem_pixon": "http://192.168.2.182:9000/resource/?s1=1.2.40.1.13.2.91754733.5232.1643381230023.26634.2.7849&cache=true&r=0"
+  }
+  ]

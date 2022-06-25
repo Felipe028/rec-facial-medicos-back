@@ -1,0 +1,16 @@
+
+node_modules/
+
+docker-compose.yml
+
+.DS_Store
+
+uploads/
+
+.env
+
+.vscode/launch.json
+
+*.lock
+package-lock.json
+logs
