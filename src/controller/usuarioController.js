@@ -50,7 +50,7 @@ const getTurnos = async (req, res) => {
 const registrarPonto = async (req, res) => {
     const { cod, id_setor, id_turno, latitude, longitude, cpf } = req.body;
 
-    if ( !cod || !id_setor || !id_turno || !latitude || !longitude || !cpf) {
+    if ( !cod || !id_setor || !id_turno || !cpf) {
         return res.status(404).send({
             status: 'false',
             msg: 'Faltam parametros',
@@ -73,6 +73,10 @@ const registrarPonto = async (req, res) => {
         //verificar quantas vagas tem p esse turno/setor
         var vagasTurnoSetor = await usuarioDAO.verificarVagasTurnoSetor(id_setor, id_turno);
         var pontosBatidos = await usuarioDAO.verificarPontosBatidos(id_setor, id_turno);
+
+        if(vagasTurnoSetor.dados.length == 0){
+            return res.status(200).send({"status": false, "msg": "Não existe agenda nesse setor para esse turno!", "dados": []});
+        }
 
         if(pontosBatidos < vagasTurnoSetor.dados[0].QTD_VAGAS){//realizar batida
             const retorno = await usuarioDAO.registrarPonto(cod, id_setor, id_turno, latitude, longitude, cpf);
