@@ -75,7 +75,7 @@ const registrarPonto = async (req, res) => {
         var pontosBatidos = await usuarioDAO.verificarPontosBatidos(id_setor, id_turno);
 
         if(vagasTurnoSetor.dados.length == 0){
-            return res.status(200).send({"status": false, "msg": "Não existe agenda nesse setor para esse turno!", "dados": []});
+            return res.status(200).send({"status": false, "msg": "Não existe escala para você nesse turno e nesse setor de atendimento!", "dados": []});
         }
 
         if(pontosBatidos < vagasTurnoSetor.dados[0].QTD_VAGAS){//realizar batida
