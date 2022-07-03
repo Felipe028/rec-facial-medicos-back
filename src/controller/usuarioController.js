@@ -21,32 +21,6 @@ const login = async (req, res) => {
 
 
 
-const getSetores = async (req, res) => {
-
-    const retorno = await usuarioDAO.getSetores();
-    
-    if(retorno.status){
-        return res.status(200).send(retorno);
-    }else{
-        return res.status(500).send(retorno);
-    }
-};
-
-
-
-const getTurnos = async (req, res) => {
-
-    const retorno = await usuarioDAO.getTurnos();
-    
-    if(retorno.status){
-        return res.status(200).send(retorno);
-    }else{
-        return res.status(500).send(retorno);
-    }
-};
-
-
-
 const registrarPonto = async (req, res) => {
     const { cod, id_setor, id_turno, latitude, longitude, cpf } = req.body;
 
@@ -95,11 +69,78 @@ const registrarPonto = async (req, res) => {
 
 
 
+const setUsuario = async (req, res) => {
+    const { nome_profissional, cpf, data_nascimento, crm, especialidade, ano_formatura } = req.body;
+
+    if ( !nome_profissional || !cpf ) {
+        return res.status(404).send({
+            status: 'false',
+            msg: 'Faltam parametros',
+        });
+    }
+
+    const retorno = await usuarioDAO.setUsuario( nome_profissional, cpf, data_nascimento, crm, especialidade, ano_formatura );
+    
+    if(retorno.status){
+        return res.status(200).send(retorno);
+    }else{
+        return res.status(500).send(retorno);
+    }
+};
+
+
+
+const updateUsuario = async (req, res) => {
+    const { nome_profissional, cpf, data_nascimento, crm, especialidade, ano_formatura } = req.body;
+
+    if ( !nome_profissional || !cpf ) {
+        return res.status(404).send({
+            status: 'false',
+            msg: 'Faltam parametros',
+        });
+    }
+
+    const retorno = await usuarioDAO.updateUsuario(req.params.id, nome_profissional, cpf, data_nascimento, crm, especialidade, ano_formatura);
+    
+    if(retorno.status){
+        return res.status(200).send(retorno);
+    }else{
+        return res.status(500).send(retorno);
+    }
+};
+
+
+
+const getUsuario = async (req, res) => {
+
+    const retorno = await usuarioDAO.getUsuario();
+    
+    if(retorno.status){
+        return res.status(200).send(retorno);
+    }else{
+        return res.status(500).send(retorno);
+    }
+};
+
+
+
+const deleteUsuario = async (req, res) => {
+
+    const retorno = await usuarioDAO.deleteUsuario(req.params.id);
+    
+    if(retorno.status){
+        return res.status(200).send(retorno);
+    }else{
+        return res.status(500).send(retorno);
+    }
+};
 
 
 module.exports = {
     login,
-    getSetores,
-    getTurnos,
     registrarPonto,
+    setUsuario,
+    updateUsuario,
+    getUsuario,
+    deleteUsuario,
 };
