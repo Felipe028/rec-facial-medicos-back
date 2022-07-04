@@ -1,5 +1,5 @@
 const oracledb = require('oracledb');
-
+const jwt = require('jsonwebtoken');
 
 async function login(cpf) {
     let retorno = {
@@ -33,6 +33,56 @@ async function login(cpf) {
     })
     .catch(err => {
         retorno.msg = "Erro ao buscar usuário";
+    });
+
+    return retorno;
+}
+
+
+
+async function loginAdm(cpf, password) {
+    let retorno = {
+        status: false,
+        msg: '',
+    };
+
+    const db = await oracledb.getConnection();
+    await db.execute(`select * from samel.profissional 
+		                where 1=1
+                            and cpf = :cpf
+                    `,
+        {
+            ':cpf': { dir: oracledb.BIND_IN, type: oracledb.STRING, val: cpf.toString()},
+            // ':password': { dir: oracledb.BIND_IN, type: oracledb.STRING, val: password.toString()},
+        },
+        
+        { outFormat: oracledb.OBJECT, autoCommit: true },
+    )
+    .then(result => {
+        if(result.rows.length > 0){
+            retorno.status = true;
+            retorno.msg = "Usuário encontrado";
+            retorno.dados = result.rows;
+            let id = retorno.dados.ID_PROFISSIONAL
+            retorno.key_token = jwt.sign(
+                { id },
+                process.env.SECRET_KEY,
+                {expiresIn: "1h"}
+            );
+            //expiresIn: 120 // it will be expired after 120ms
+            //expiresIn: "120s" // it will be expired after 120s
+            //expiresIn: "10h" // it will be expired after 10 hours
+            //expiresIn: "20d" // it will be expired after 20 days
+        }else{
+            retorno.status = false;
+            retorno.msg = "Usuário não encontrado";
+        }
+    })
+    .finally(function() {
+        db.close();
+    })
+    .catch(err => {
+        retorno.msg = "Erro ao buscar usuário adm" + err;
     });
 
     return retorno;
@@ -360,6 +410,7 @@ async function deleteUsuario(id) {
 
 module.exports = {
     login,
+    loginAdm,
     verificarVagasTurnoSetor,
     verificarSeusuarioBateuPonto,
     verificarPontosBatidos,

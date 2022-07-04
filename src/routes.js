@@ -17,24 +17,24 @@ const { authenticate } = require('./middleware/authenticate')
 
 router.post('/login', usuarioController.login);
 router.post('/registrarPonto', authenticate, usuarioController.registrarPonto);
-router.post('/setUsuario', usuarioController.setUsuario);
-router.put('/updateUsuario/:id', usuarioController.updateUsuario);
-router.get('/getUsuario', usuarioController.getUsuario);
-router.delete('/deleteUsuario/:id', usuarioController.deleteUsuario);
+router.post('/setUsuario', authenticate, usuarioController.setUsuario);
+router.put('/updateUsuario/:id', authenticate, usuarioController.updateUsuario);
+router.get('/getUsuario', authenticate, usuarioController.getUsuario);
+router.delete('/deleteUsuario/:id', authenticate, usuarioController.deleteUsuario);
 
-router.post('/setSetor', setorController.setSetor);
-router.put('/updateSetor/:id', setorController.updateSetor);
-router.get('/getSetores', setorController.getSetores);
-router.delete('/deleteSetor/:id', setorController.deleteSetor);
+router.post('/setSetor', authenticate, setorController.setSetor);
+router.put('/updateSetor/:id', authenticate, setorController.updateSetor);
+router.get('/getSetores', authenticate, setorController.getSetores);
+router.delete('/deleteSetor/:id', authenticate, setorController.deleteSetor);
 
-router.post('/setTurnos', turnoController.setTurnos);
-router.put('/updateTurnos/:id', turnoController.updateTurnos);
-router.get('/getTurnos', turnoController.getTurnos);
-router.delete('/deleteTurno/:id', turnoController.deleteTurno);
+router.post('/setTurnos', authenticate, turnoController.setTurnos);
+router.put('/updateTurnos/:id', authenticate, turnoController.updateTurnos);
+router.get('/getTurnos', authenticate, turnoController.getTurnos);
+router.delete('/deleteTurno/:id', authenticate, turnoController.deleteTurno);
 
-router.post('/setEscalas', escalaController.setEscalas);
-router.put('/updateEscalas/:id', escalaController.updateEscalas);
-router.get('/getEscalas', escalaController.getEscalas);
-router.delete('/deleteEscalas/:id', escalaController.deleteEscalas);
+router.post('/setEscalas', authenticate, escalaController.setEscalas);
+router.put('/updateEscalas/:id', authenticate, escalaController.updateEscalas);
+router.get('/getEscalas', authenticate, escalaController.getEscalas);
+router.delete('/deleteEscalas/:id', authenticate, escalaController.deleteEscalas);
 
 module.exports = router;

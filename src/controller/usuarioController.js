@@ -1,7 +1,8 @@
 const usuarioDAO = require('../DAO/usuarioDAO');
 
+
 const login = async (req, res) => {
-    const { cpf } = req.body;
+    const { cpf, password } = req.body;
 
     if (!cpf) {
         return res.status(404).send({
@@ -10,12 +11,20 @@ const login = async (req, res) => {
         });
     }
 
-    const retorno = await usuarioDAO.login(cpf);
-    
-    if(retorno.status){
-        return res.status(200).send(retorno);
+    if(!password){
+        const retorno = await usuarioDAO.login(cpf);
+        if(retorno.status){
+            return res.status(200).send(retorno);
+        }else{
+            return res.status(500).send(retorno);
+        }
     }else{
-        return res.status(500).send(retorno);
+        const retorno = await usuarioDAO.loginAdm(cpf, password);
+        if(retorno.status){
+            return res.status(200).send(retorno);
+        }else{
+            return res.status(500).send(retorno);
+        }
     }
 };
 
