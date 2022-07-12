@@ -75,6 +75,43 @@ async function updateSetor(id, nome_setor, sigla_setor) {
 
 
 
+async function getSetor(id_setor) {
+    let retorno = {
+        status: false,
+        msg: '',
+    };
+
+    const db = await oracledb.getConnection();
+    await db.execute(`select * from samel.setor
+                        where id_setor = :id_setor
+                    `,
+        {
+            ':id_setor': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_setor)},
+        },
+        { outFormat: oracledb.OBJECT, autoCommit: true },
+    )
+    .then(result => {
+        if(result.rows.length > 0){
+            retorno.status = true;
+            retorno.msg = "Listar setores";
+            retorno.dados = result.rows[0];
+        }else{
+            retorno.status = false;
+            retorno.msg = "Nenhum setor cadastrado";
+        }
+    })
+    .finally(function() {
+        db.close();
+    })
+    .catch(err => {
+        retorno.msg = "Erro ao buscar setores";
+    });
+
+    return retorno;
+}
+
+
+
 async function getSetores() {
     let retorno = {
         status: false,
@@ -143,6 +180,7 @@ async function deleteSetor(id) {
 module.exports = {
     setSetor,
     updateSetor,
+    getSetor,
     getSetores,
     deleteSetor,
 };

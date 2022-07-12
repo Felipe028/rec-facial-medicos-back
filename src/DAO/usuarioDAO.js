@@ -50,10 +50,11 @@ async function loginAdm(cpf, password) {
     await db.execute(`select * from samel.profissional 
 		                where 1=1
                             and cpf = :cpf
+                            and password = :password
                     `,
         {
             ':cpf': { dir: oracledb.BIND_IN, type: oracledb.STRING, val: cpf.toString()},
-            // ':password': { dir: oracledb.BIND_IN, type: oracledb.STRING, val: password.toString()},
+            ':password': { dir: oracledb.BIND_IN, type: oracledb.STRING, val: password.toString()},
         },
         
         { outFormat: oracledb.OBJECT, autoCommit: true },
@@ -64,7 +65,7 @@ async function loginAdm(cpf, password) {
             retorno.msg = "Usuário encontrado";
             retorno.dados = result.rows;
             let id = retorno.dados.ID_PROFISSIONAL
-            retorno.key_token = jwt.sign(
+            retorno.token_key = jwt.sign(
                 { id },
                 process.env.SECRET_KEY,
                 {expiresIn: "1h"}
@@ -247,7 +248,7 @@ async function registrarPonto(cod, id_setor, id_turno, latitude, longitude, cpf)
 
 
 
-async function setUsuario( nome_profissional, cpf, data_nascimento, crm, especialidade, ano_formatura ) {
+async function setUsuario( nome_profissional, cpf, data_nascimento, crm, especialidade, ano_formatura, password ) {
     let retorno = {
         status: false,
         msg: '',
@@ -260,7 +261,8 @@ async function setUsuario( nome_profissional, cpf, data_nascimento, crm, especia
                             data_nascimento,
                             crm,
                             especialidade,
-                            ano_formatura
+                            ano_formatura,
+                            password
                         ) 
                         VALUES (
                             :nome_profissional,
@@ -268,7 +270,8 @@ async function setUsuario( nome_profissional, cpf, data_nascimento, crm, especia
                             to_date(:data_nascimento, 'DD/MM/YYYY'),
                             :crm,
                             :especialidade,
-                            :ano_formatura
+                            :ano_formatura,
+                            :password
                         )
                     `,
         {
@@ -277,7 +280,8 @@ async function setUsuario( nome_profissional, cpf, data_nascimento, crm, especia
             ':data_nascimento': { dir: oracledb.BIND_IN, type: oracledb.STRING, val: data_nascimento.toString()},
             ':crm': { dir: oracledb.BIND_IN, type: oracledb.STRING, val: crm.toString()},
             ':especialidade': { dir: oracledb.BIND_IN, type: oracledb.STRING, val: especialidade.toString()},
-            ':ano_formatura': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(ano_formatura)}
+            ':ano_formatura': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(ano_formatura)},
+            ':password': { dir: oracledb.BIND_IN, type: oracledb.STRING, val: password.toString()}
         },
         { outFormat: oracledb.OBJECT, autoCommit: true },
     )
@@ -343,7 +347,44 @@ async function updateUsuario(id, nome_profissional, cpf, data_nascimento, crm, e
 
 
 
-async function getUsuario() {
+async function getUsuario(id_profissional) {
+    let retorno = {
+        status: false,
+        msg: '',
+    };
+
+    const db = await oracledb.getConnection();
+    await db.execute(`select * from samel.profissional
+                            where id_profissional = :id_profissional
+                    `,
+        {
+            ':id_profissional': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_profissional)},
+        },
+        { outFormat: oracledb.OBJECT, autoCommit: true },
+    )
+    .then(result => {
+        if(result.rows.length > 0){
+            retorno.status = true;
+            retorno.msg = "Usuario encontrado";
+            retorno.dados = result.rows[0];
+        }else{
+            retorno.status = false;
+            retorno.msg = "Nenhum usuario cadastrado";
+        }
+    })
+    .finally(function() {
+        db.close();
+    })
+    .catch(err => {
+        retorno.msg = "Erro ao buscar usuários";
+    });
+
+    return retorno;
+}
+
+
+
+async function getUsuarios() {
     let retorno = {
         status: false,
         msg: '',
@@ -418,5 +459,6 @@ module.exports = {
     setUsuario,
     updateUsuario,
     getUsuario,
+    getUsuarios,
     deleteUsuario,
 };

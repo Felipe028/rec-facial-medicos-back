@@ -42,6 +42,27 @@ const updateSetor = async (req, res) => {
 
 
 
+const getSetor = async (req, res) => {
+    const { id_setor } = req.body;
+
+    if ( !id_setor ) {
+        return res.status(404).send({
+            status: 'false',
+            msg: 'Faltam parametros',
+        });
+    }
+
+    const retorno = await setorDAO.getSetor(id_setor);
+    
+    if(retorno.status){
+        return res.status(200).send(retorno);
+    }else{
+        return res.status(500).send(retorno);
+    }
+};
+
+
+
 const getSetores = async (req, res) => {
 
     const retorno = await setorDAO.getSetores();
@@ -49,7 +70,7 @@ const getSetores = async (req, res) => {
     if(retorno.status){
         return res.status(200).send(retorno);
     }else{
-        return res.status(500).send(retorno);
+        return res.status(200).send(retorno);
     }
 };
 
@@ -71,6 +92,7 @@ const deleteSetor = async (req, res) => {
 module.exports = {
     setSetor,
     updateSetor,
+    getSetor,
     getSetores,
     deleteSetor,
 };

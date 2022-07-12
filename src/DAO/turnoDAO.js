@@ -81,6 +81,43 @@ async function updateTurnos(id, nome_turno, entrada, saida) {
 
 
 
+async function getTurno(id_turno) {
+    let retorno = {
+        status: false,
+        msg: '',
+    };
+
+    const db = await oracledb.getConnection();
+    await db.execute(`select * from samel.turno
+                        where id_turno = :id_turno
+                    `,
+        {
+            ':id_turno': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_turno)},
+        },
+        { outFormat: oracledb.OBJECT, autoCommit: true },
+    )
+    .then(result => {
+        if(result.rows.length > 0){
+            retorno.status = true;
+            retorno.msg = "Listar turnos";
+            retorno.dados = result.rows[0];
+        }else{
+            retorno.status = false;
+            retorno.msg = "Nenhum turno cadastrado";
+        }
+    })
+    .finally(function() {
+        db.close();
+    })
+    .catch(err => {
+        retorno.msg = "Erro ao buscar setores";
+    });
+
+    return retorno;
+}
+
+
+
 async function getTurnos() {
     let retorno = {
         status: false,
@@ -152,6 +189,7 @@ async function deleteTurno(id) {
 module.exports = {
     setTurnos,
     updateTurnos,
+    getTurno,
     getTurnos,
     deleteTurno,
 };

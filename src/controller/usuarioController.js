@@ -79,7 +79,7 @@ const registrarPonto = async (req, res) => {
 
 
 const setUsuario = async (req, res) => {
-    const { nome_profissional, cpf, data_nascimento, crm, especialidade, ano_formatura } = req.body;
+    const { nome_profissional, cpf, data_nascimento, crm, especialidade, ano_formatura, password } = req.body;
 
     if ( !nome_profissional || !cpf ) {
         return res.status(404).send({
@@ -88,7 +88,7 @@ const setUsuario = async (req, res) => {
         });
     }
 
-    const retorno = await usuarioDAO.setUsuario( nome_profissional, cpf, data_nascimento, crm, especialidade, ano_formatura );
+    const retorno = await usuarioDAO.setUsuario( nome_profissional, cpf, data_nascimento, crm, especialidade, ano_formatura, password );
     
     if(retorno.status){
         return res.status(200).send(retorno);
@@ -121,13 +121,34 @@ const updateUsuario = async (req, res) => {
 
 
 const getUsuario = async (req, res) => {
+    const { id_profissional } = req.body;
 
-    const retorno = await usuarioDAO.getUsuario();
+    if ( !id_profissional ) {
+        return res.status(404).send({
+            status: 'false',
+            msg: 'Faltam parametros',
+        });
+    }
+
+    const retorno = await usuarioDAO.getUsuario(id_profissional);
     
     if(retorno.status){
         return res.status(200).send(retorno);
     }else{
         return res.status(500).send(retorno);
+    }
+};
+
+
+
+const getUsuarios = async (req, res) => {
+
+    const retorno = await usuarioDAO.getUsuarios();
+    
+    if(retorno.status){
+        return res.status(200).send(retorno);
+    }else{
+        return res.status(200).send(retorno);
     }
 };
 
@@ -151,5 +172,6 @@ module.exports = {
     setUsuario,
     updateUsuario,
     getUsuario,
+    getUsuarios,
     deleteUsuario,
 };

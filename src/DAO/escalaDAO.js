@@ -90,6 +90,46 @@ async function updateEscalas(id, id_setor, id_profissional, id_turno, data_inici
 
 
 
+async function getEscala(id_escala) {
+    let retorno = {
+        status: false,
+        msg: '',
+    };
+
+    const db = await oracledb.getConnection();
+    await db.execute(`SELECT b.nome_profissional, a.*
+                        FROM samel.escala a
+                        INNER JOIN samel.profissional b
+                        ON a.id_profissional = b.id_profissional
+                        where a.id_escala = :id_escala
+                    `,
+        {
+            ':id_escala': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_escala)},
+        },
+        { outFormat: oracledb.OBJECT, autoCommit: true },
+    )
+    .then(result => {
+        if(result.rows.length > 0){
+            retorno.status = true;
+            retorno.msg = "Listar escalas";
+            retorno.dados = result.rows[0];
+        }else{
+            retorno.status = false;
+            retorno.msg = "Nenhuma escala cadastrada";
+        }
+    })
+    .finally(function() {
+        db.close();
+    })
+    .catch(err => {
+        retorno.msg = "Erro ao buscar escalas";
+    });
+
+    return retorno;
+}
+
+
+
 async function getEscalas() {
     let retorno = {
         status: false,
@@ -160,6 +200,7 @@ async function deleteEscalas(id) {
 module.exports = {
     setEscalas,
     updateEscalas,
+    getEscala,
     getEscalas,
     deleteEscalas,
 };

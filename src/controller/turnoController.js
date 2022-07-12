@@ -43,6 +43,27 @@ const updateTurnos = async (req, res) => {
 
 
 
+const getTurno = async (req, res) => {
+    const { id_turno } = req.body;
+
+    if ( !id_turno ) {
+        return res.status(404).send({
+            status: 'false',
+            msg: 'Faltam parametros',
+        });
+    }
+
+    const retorno = await turnoDAO.getTurno(id_turno);
+    
+    if(retorno.status){
+        return res.status(200).send(retorno);
+    }else{
+        return res.status(500).send(retorno);
+    }
+};
+
+
+
 const getTurnos = async (req, res) => {
 
     const retorno = await turnoDAO.getTurnos();
@@ -50,7 +71,7 @@ const getTurnos = async (req, res) => {
     if(retorno.status){
         return res.status(200).send(retorno);
     }else{
-        return res.status(500).send(retorno);
+        return res.status(200).send(retorno);
     }
 };
 
@@ -72,6 +93,7 @@ const deleteTurno = async (req, res) => {
 module.exports = {
     setTurnos,
     updateTurnos,
+    getTurno,
     getTurnos,
     deleteTurno,
 };

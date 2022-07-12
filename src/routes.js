@@ -19,21 +19,25 @@ router.post('/login', usuarioController.login);
 router.post('/registrarPonto', authenticate, usuarioController.registrarPonto);
 router.post('/setUsuario', authenticate, usuarioController.setUsuario);
 router.put('/updateUsuario/:id', authenticate, usuarioController.updateUsuario);
-router.get('/getUsuario', authenticate, usuarioController.getUsuario);
+router.post('/getUsuario', authenticate, usuarioController.getUsuario);
+router.get('/getUsuario', authenticate, usuarioController.getUsuarios);
 router.delete('/deleteUsuario/:id', authenticate, usuarioController.deleteUsuario);
 
 router.post('/setSetor', authenticate, setorController.setSetor);
 router.put('/updateSetor/:id', authenticate, setorController.updateSetor);
-router.get('/getSetores', authenticate, setorController.getSetores);
+router.post('/getSetor', setorController.getSetor);
+router.get('/getSetores', setorController.getSetores);
 router.delete('/deleteSetor/:id', authenticate, setorController.deleteSetor);
 
 router.post('/setTurnos', authenticate, turnoController.setTurnos);
 router.put('/updateTurnos/:id', authenticate, turnoController.updateTurnos);
-router.get('/getTurnos', authenticate, turnoController.getTurnos);
+router.post('/getTurno', turnoController.getTurno);
+router.get('/getTurnos', turnoController.getTurnos);
 router.delete('/deleteTurno/:id', authenticate, turnoController.deleteTurno);
 
 router.post('/setEscalas', authenticate, escalaController.setEscalas);
 router.put('/updateEscalas/:id', authenticate, escalaController.updateEscalas);
+router.post('/getEscala', authenticate, escalaController.getEscala);
 router.get('/getEscalas', authenticate, escalaController.getEscalas);
 router.delete('/deleteEscalas/:id', authenticate, escalaController.deleteEscalas);
 
