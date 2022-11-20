@@ -1,77 +1,44 @@
 const express = require('express');
 const router = express.Router();
-const { checarDiagnosticoExistente } = require('./DAO/prontuarioDAO');
 
-multer = require('multer');
-path = require('path');
-crypto = require('crypto');
+// const medicalController = require('./controller/medicalController');
+// const zoomController = require('./controller/zoomController');
+// const prontuarioController = require('./controller/prontuarioController');
+// const telemedicinaController = require('./controller/telemedicinaController');
+// const laudosController = require('./controller/laudoController');
+// const prontoSocorroController = require('./controller/prontoSocorroController');
 
-const upload = multer({
-    dest: 'swap/',
-    limits: {
-        fieldSize: 8 * 1024 * 1024,
-    },
-});
-
-const checarDiagnostico = async (req, res, next) => {
-    const { NR_ATENDIMENTO, NM_USUARIO } = req.body;
-
-    console.log({ NR_ATENDIMENTO, NM_USUARIO });
-    const diagnosticoAtendimento = await checarDiagnosticoExistente(
-        NR_ATENDIMENTO,
-        NM_USUARIO,
-    );
-
-    console.log(diagnosticoAtendimento);
-
-    if (diagnosticoAtendimento) {
-        next();
-    } else {
-        res.send({
-            status: false,
-            msg: 'Atendimento sem diagnóstico',
-        });
-    }
-};
-
-var crypto;
-var storage = multer.diskStorage({
-    destination: './swap/',
-    filename: function (req, file, cb) {
-        return crypto.pseudoRandomBytes(16, function (err, raw) {
-            if (err) {
-                return cb(err);
-            }
-            return cb(
-                null,
-                '' + raw.toString('hex') + path.extname(file.originalname),
-            );
-        });
-    },
-});
-
-const medicalController = require('./controller/medicalController');
-const zoomController = require('./controller/zoomController');
-const prontuarioController = require('./controller/prontuarioController');
-const telemedicinaController = require('./controller/telemedicinaController');
-const laudosController = require('./controller/laudoController');
-const prontoSocorroController = require('./controller/prontoSocorroController');
-
-// >>>>>>>>>>Novos controllers>>>>>>>>>>
 const usuarioController = require('./controller/usuarioController');
+const setorController = require('./controller/setorController');
+const turnoController = require('./controller/turnoController');
+const escalaController = require('./controller/escalaController');
+
 const { authenticate } = require('./middleware/authenticate')
-// <<<<<<<<<<Novos controllers<<<<<<<<<<
 
-// >>>>>>>>>>>>>>>>>>>>>>>>>>Novas Rotas<<<<<<<<<<<<<<<<<<<<<<<<<
 router.post('/login', usuarioController.login);
-
-router.get('/getSetores', usuarioController.getSetores);
-
-router.get('/getTurnos', usuarioController.getTurnos);
-
 router.post('/registrarPonto', authenticate, usuarioController.registrarPonto);
-// >>>>>>>>>>>>>>>>>>>>>>>>>>Novas Rotas<<<<<<<<<<<<<<<<<<<<<<<<<
+router.post('/setUsuario', authenticate, usuarioController.setUsuario);
+router.put('/updateUsuario/:id', authenticate, usuarioController.updateUsuario);
+router.post('/getUsuario', authenticate, usuarioController.getUsuario);
+router.get('/getUsuario', authenticate, usuarioController.getUsuarios);
+router.delete('/deleteUsuario/:id', authenticate, usuarioController.deleteUsuario);
 
+router.post('/setSetor', authenticate, setorController.setSetor);
+router.put('/updateSetor/:id', authenticate, setorController.updateSetor);
+router.post('/getSetor', setorController.getSetor);
+router.get('/getSetores', setorController.getSetores);
+router.delete('/deleteSetor/:id', authenticate, setorController.deleteSetor);
 
+router.post('/setTurnos', authenticate, turnoController.setTurnos);
+router.put('/updateTurnos/:id', authenticate, turnoController.updateTurnos);
+router.post('/getTurno', turnoController.getTurno);
+router.get('/getTurnos', turnoController.getTurnos);
+router.delete('/deleteTurno/:id', authenticate, turnoController.deleteTurno);
+
+router.post('/setEscalas', authenticate, escalaController.setEscalas);
+router.put('/updateEscalas/:id', authenticate, escalaController.updateEscalas);
+router.post('/getEscala', authenticate, escalaController.getEscala);
+router.get('/getEscalas', authenticate, escalaController.getEscalas);
+router.delete('/deleteEscalas/:id', authenticate, escalaController.deleteEscalas);
 
 module.exports = router;
