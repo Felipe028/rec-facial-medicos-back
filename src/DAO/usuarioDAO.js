@@ -134,16 +134,16 @@ async function verificarVagasTurnoSetor(id_setor, id_turno) {
 
 
 
-async function verificarSeusuarioBateuPonto(id_setor, id_turno, cod) {
+async function verificarTurnoNoturno(id_setor, id_turno, cod) {
     let retorno
 
     const db = await oracledb.getConnection();
-    await db.execute(`select count(id_profissional) as batidas from samel.registro_ponto 
+    await db.execute(`select * from samel.registro_ponto 
                         where 1 = 1
                             and id_setor = :id_setor
                             and id_turno = :id_turno
                             and id_profissional = :cod
-                            and trunc(hora_registro) = trunc(sysdate)
+                            and trunc(hora_entrada) = trunc(sysdate-1)
                     `,
         {
             ':id_setor': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_setor)},
@@ -153,7 +153,134 @@ async function verificarSeusuarioBateuPonto(id_setor, id_turno, cod) {
         { outFormat: oracledb.OBJECT, autoCommit: true },
     )
     .then(result => {
-        retorno = result.rows[0].BATIDAS;
+        retorno = result.rows;
+    })
+    .finally(function() {
+        db.close();
+    })
+    .catch(err => {
+        console.log("Erro ao calcular diferença entre horas" + err);
+    });
+
+    return retorno
+}
+
+
+
+async function verificarLimiteHorasTurnos(id_turno) {
+    let retorno
+
+    const db = await oracledb.getConnection();
+    await db.execute(`select nome_turno, to_char(saida - entrada) as HORAS from samel.turno 
+                        where 1 = 1
+                        and id_turno = :id_turno
+                    `,
+        {
+            ':id_turno': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_turno)},
+        },
+        { outFormat: oracledb.OBJECT, autoCommit: true },
+    )
+    .then(result => {
+        retorno = result.rows[0];
+    })
+    .finally(function() {
+        db.close();
+    })
+    .catch(err => {
+        console.log("Erro ao calcular diferença entre horas do turno" + err);
+    });
+
+    return retorno
+}
+
+
+
+async function diferencaHorasBatidaAnteriorAtualDia(id_setor, id_turno, cod) {
+    let retorno
+
+    const db = await oracledb.getConnection();
+    await db.execute(`select to_char(sysdate - hora_entrada) as DIFERENCA from samel.registro_ponto 
+                        where 1 = 1
+                            and id_setor = :id_setor
+                            and id_turno = :id_turno
+                            and id_profissional = :cod
+                            and trunc(hora_entrada) = trunc(sysdate)
+                    `,
+        {
+            ':id_setor': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_setor)},
+            ':id_turno': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_turno)},
+            ':cod': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(cod)},
+        },
+        { outFormat: oracledb.OBJECT, autoCommit: true },
+    )
+    .then(result => {
+        retorno = result.rows[0];
+    })
+    .finally(function() {
+        db.close();
+    })
+    .catch(err => {
+        console.log("Erro ao calcular diferença entre horas do turno" + err);
+    });
+
+    return retorno
+}
+
+
+
+async function diferencaHorasBatidaAnteriorAtual(id_setor, id_turno, cod) {
+    let retorno
+
+    const db = await oracledb.getConnection();
+    await db.execute(`select to_char(sysdate - hora_entrada) as DIFERENCA from samel.registro_ponto 
+                        where 1 = 1
+                            and id_setor = :id_setor
+                            and id_turno = :id_turno
+                            and id_profissional = :cod
+                            and trunc(hora_entrada) = trunc(sysdate-1)
+                    `,
+        {
+            ':id_setor': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_setor)},
+            ':id_turno': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_turno)},
+            ':cod': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(cod)},
+        },
+        { outFormat: oracledb.OBJECT, autoCommit: true },
+    )
+    .then(result => {
+        retorno = result.rows[0];
+    })
+    .finally(function() {
+        db.close();
+    })
+    .catch(err => {
+        console.log("Erro ao calcular diferença entre horas do turno" + err);
+    });
+
+    return retorno
+}
+
+
+
+async function verificarSeusuarioBateuPonto(id_setor, id_turno, cod) {
+    let retorno
+
+    const db = await oracledb.getConnection();
+    await db.execute(`select * from samel.registro_ponto 
+                        where 1 = 1
+                            and id_setor = :id_setor
+                            and id_turno = :id_turno
+                            and id_profissional = :cod
+                            and trunc(hora_entrada) = trunc(sysdate)
+                    `,
+        {
+            ':id_setor': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_setor)},
+            ':id_turno': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_turno)},
+            ':cod': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(cod)},
+        },
+        { outFormat: oracledb.OBJECT, autoCommit: true },
+    )
+    .then(result => {
+        retorno = result.rows;
     })
     .finally(function() {
         db.close();
@@ -198,7 +325,7 @@ async function verificarPontosBatidos(id_setor, id_turno) {
 
 
 
-async function registrarPonto(cod, id_setor, id_turno, latitude, longitude, cpf) {
+async function registrarPontoEntrada(cod, id_setor, id_turno, latitude, longitude, cpf) {
     let retorno = {
         status: false,
         msg: '',
@@ -211,7 +338,7 @@ async function registrarPonto(cod, id_setor, id_turno, latitude, longitude, cpf)
             ID_PROFISSIONAL, 
             ID_SETOR,
             ID_TURNO,
-            HORA_REGISTRO
+            HORA_ENTRADA
     )VALUES(
             :latitude,
             :longitude,
@@ -227,6 +354,41 @@ async function registrarPonto(cod, id_setor, id_turno, latitude, longitude, cpf)
             ':cod': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(cod)},
             ':id_setor': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_setor)},
             ':id_turno': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_turno)},
+        },
+        
+        { outFormat: oracledb.OBJECT, autoCommit: true },
+    )
+    .then(result => {
+        retorno.status = true;
+        retorno.msg = "Ponto registrado com sucesso!";
+    })
+    .finally(function() {
+        db.close();
+    })
+    .catch(err => {
+        console.log(err)
+        retorno.msg = "Erro ao registrar ponto!";
+    });
+
+    return retorno;
+};
+
+
+
+async function registrarPontoSaida(cod) {
+    let retorno = {
+        status: false,
+        msg: '',
+    };
+
+    const db = await oracledb.getConnection();
+    await db.execute(`UPDATE samel.registro_ponto SET
+                            HORA_SAIDA = sysdate
+                        WHERE
+                            id_registro_ponto = :cod
+    `,
+        {
+            ':cod': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(cod)},
         },
         
         { outFormat: oracledb.OBJECT, autoCommit: true },
@@ -299,8 +461,6 @@ async function setUsuario( nome_profissional, cpf, data_nascimento, crm, especia
 
     return retorno;
 };
-
-
 
 async function updateUsuario(id, nome_profissional, cpf, data_nascimento, crm, especialidade, ano_formatura) {
     let retorno = {
@@ -453,9 +613,14 @@ module.exports = {
     login,
     loginAdm,
     verificarVagasTurnoSetor,
+    verificarTurnoNoturno,
+    verificarLimiteHorasTurnos,
+    diferencaHorasBatidaAnteriorAtualDia,
+    diferencaHorasBatidaAnteriorAtual,
     verificarSeusuarioBateuPonto,
     verificarPontosBatidos,
-    registrarPonto,
+    registrarPontoEntrada,
+    registrarPontoSaida,
     setUsuario,
     updateUsuario,
     getUsuario,
