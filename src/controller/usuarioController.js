@@ -183,7 +183,6 @@ const updateUsuario = async (req, res) => {
     }
 
     const retorno = await usuarioDAO.updateUsuario(req.params.id, nome_profissional, cpf, data_nascimento, crm, especialidade, ano_formatura);
-    
     if(retorno.status){
         return res.status(200).send(retorno);
     }else{
@@ -195,6 +194,7 @@ const updateUsuario = async (req, res) => {
 
 const getUsuario = async (req, res) => {
     const { id_profissional } = req.body;
+    
 
     if ( !id_profissional ) {
         return res.status(404).send({
