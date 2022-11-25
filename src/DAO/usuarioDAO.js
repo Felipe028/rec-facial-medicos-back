@@ -144,6 +144,7 @@ async function verificarTurnoNoturno(id_setor, id_turno, cod) {
                             and id_turno = :id_turno
                             and id_profissional = :cod
                             and trunc(hora_entrada) = trunc(sysdate-1)
+                            order by id_registro_ponto desc
                     `,
         {
             ':id_setor': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_setor)},
@@ -238,6 +239,7 @@ async function diferencaHorasBatidaAnteriorAtual(id_setor, id_turno, cod) {
                             and id_turno = :id_turno
                             and id_profissional = :cod
                             and trunc(hora_entrada) = trunc(sysdate-1)
+                            order by DIFERENCA asc
                     `,
         {
             ':id_setor': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_setor)},
@@ -254,6 +256,37 @@ async function diferencaHorasBatidaAnteriorAtual(id_setor, id_turno, cod) {
     })
     .catch(err => {
         console.log("Erro ao calcular diferença entre horas do turno" + err);
+    });
+
+    return retorno
+}
+
+
+
+async function verificarlimitesDoTurno(id_turno) {
+    let retorno
+
+    const db = await oracledb.getConnection();
+    await db.execute(`select
+                        to_char(a.entrada, 'HH24') hora_entrada,
+                        to_char(a.saida, 'HH24') hora_saida,
+                        to_char(sysdate, 'HH24') as hora_atual,
+                        a.* 
+                        from samel.turno a where id_turno=:id_turno
+                    `,
+        {
+            ':id_turno': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_turno)},
+        },
+        { outFormat: oracledb.OBJECT, autoCommit: true },
+    )
+    .then(result => {
+        retorno = result.rows[0];
+    })
+    .finally(function() {
+        db.close();
+    })
+    .catch(err => {
+        console.log("Erro ao buscar pontos batidos" + err);
     });
 
     return retorno
@@ -605,6 +638,46 @@ async function deleteUsuario(id) {
 
     return retorno;
 }
+
+
+
+async function getFolhaPonto(id, mes, ano) {
+    let retorno = {
+        status: false,
+        msg: '',
+    };
+
+
+    const db = await oracledb.getConnection();
+    await db.execute(`SELECT 
+    (select nome_turno from samel.turno where id_turno=a.id_turno) as turno,
+    (select nome_setor from samel.setor where id_setor=a.id_setor) as setor,
+    to_char(a.hora_entrada, 'DD') dia_entrada,
+    to_char(a.hora_saida, 'DD') dia_saida,
+    to_char(a.hora_entrada, 'HH24:MI') hora_entrada1,
+    to_char(a.hora_saida, 'HH24:MI') hora_saida1,
+    a.* 
+    FROM samel.registro_ponto a WHERE extract(month from hora_entrada) = :mes and extract (year from hora_entrada) = :ano`,
+        {
+            ':mes': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(mes)},
+            ':ano': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(ano)},
+        },
+        { outFormat: oracledb.OBJECT, autoCommit: true },
+    )
+    .then(result => {
+        retorno.status = true
+        retorno.msg = "Sucesso!"
+        retorno.dados = result.rows
+    })
+    .finally(function() {
+        db.close();
+    })
+    .catch(err => {
+        retorno.msg = "Erro ao listar folha de ponto" + err;
+    });
+
+    return retorno;
+}
 // <<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>
 // <<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>
 // <<<<<<<<<<<<<<<<<<<<<>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -617,6 +690,7 @@ module.exports = {
     verificarLimiteHorasTurnos,
     diferencaHorasBatidaAnteriorAtualDia,
     diferencaHorasBatidaAnteriorAtual,
+    verificarlimitesDoTurno,
     verificarSeusuarioBateuPonto,
     verificarPontosBatidos,
     registrarPontoEntrada,
@@ -626,4 +700,5 @@ module.exports = {
     getUsuario,
     getUsuarios,
     deleteUsuario,
+    getFolhaPonto,
 };

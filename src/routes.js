@@ -22,6 +22,7 @@ router.put('/updateUsuario/:id', authenticate, usuarioController.updateUsuario);
 router.post('/getUsuario', authenticate, usuarioController.getUsuario);
 router.get('/getUsuario', authenticate, usuarioController.getUsuarios);
 router.delete('/deleteUsuario/:id', authenticate, usuarioController.deleteUsuario);
+router.post('/getFolhaPonto/:id', authenticate, usuarioController.getFolhaPonto);
 
 router.post('/setSetor', authenticate, setorController.setSetor);
 router.put('/updateSetor/:id', authenticate, setorController.updateSetor);
@@ -40,5 +41,6 @@ router.put('/updateEscalas/:id', authenticate, escalaController.updateEscalas);
 router.post('/getEscala', authenticate, escalaController.getEscala);
 router.get('/getEscalas', authenticate, escalaController.getEscalas);
 router.delete('/deleteEscalas/:id', authenticate, escalaController.deleteEscalas);
+
 
 module.exports = router;

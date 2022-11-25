@@ -39,6 +39,24 @@ const registrarPonto = async (req, res) => {
             msg: 'Faltam parametros',
         });
     }
+    //verificar se a batida ta dentro do limite do turno (limite de 1h antes e 1h depois)
+    var verificarlimitesDoTurno = await usuarioDAO.verificarlimitesDoTurno(id_turno);
+    let hora_entra = parseInt(verificarlimitesDoTurno.HORA_ENTRADA)
+    let hora_saida = parseInt(verificarlimitesDoTurno.HORA_SAIDA)
+    let hora_atual = parseInt(verificarlimitesDoTurno.HORA_ATUAL)
+
+    if(hora_entra < hora_saida){//turno que começa e termina no mesmo dia
+        console.log("lim_hora_entra", hora_entra+1, "---", "lim_hora_saida", hora_saida-1)
+        if(hora_atual >= hora_entra-1 && hora_atual <= hora_saida+1){//Se tiver dentro do limite do turno
+        }else{
+            return res.status(200).send({"status": false, "msg": "Você não pode registrar ponto fora do horario limite definido para o turno!", "dados": []})
+        }
+    }else{//turno que começa em um dia e termina no outro
+        if(hora_atual >= hora_entra-1 || hora_atual <= hora_saida+1){//Se tiver dentro do limite do turno
+        }else{
+            return res.status(200).send({"status": false, "msg": "Você não pode registrar ponto fora do horario limite definido para o turno 2!", "dados": []})
+        }
+    }
 
     //verificar quantas batidas o usuario realizou no dia/setor/turno
     var verificarSeusuarioBateuPonto = await usuarioDAO.verificarSeusuarioBateuPonto(id_setor, id_turno, cod);
@@ -47,11 +65,19 @@ const registrarPonto = async (req, res) => {
         if(verificarSeusuarioBateuPonto[0].HORA_SAIDA){
             return res.status(200).send({"status": false, "msg": "Você já atingiu o limite máximo de registro de pontos, para esse turno/setor, hoje", "dados": []});
         }else{
+            //verificar o limite maximo de horas em um determinado turno
+            var verificarLimiteHorasTurnos = await usuarioDAO.verificarLimiteHorasTurnos(id_turno);
+            let temp = verificarLimiteHorasTurnos.HORAS.substr(11, 2)
+            let limiteMaxTurno = parseInt(temp) + 1;
+
             //calcular a diferença da batida anterior para a atual
             var diferencaHorasBatidaAnteriorAtual = await usuarioDAO.diferencaHorasBatidaAnteriorAtualDia(id_setor, id_turno, cod);
             difAtualAnterior = parseInt(diferencaHorasBatidaAnteriorAtual.DIFERENCA.substr(11, 2))
 
-            if(difAtualAnterior < 7){//Se limite de tempo da batida tiver dentro do limite do turno
+            console.log("limiteMaxTurno>>", limiteMaxTurno)
+            console.log("difAtualAnterior>>", difAtualAnterior)
+
+            if(difAtualAnterior < limiteMaxTurno){//Se limite de tempo da batida tiver dentro do limite do turno
                 //bater ponto saída
                 const retorno = await usuarioDAO.registrarPontoSaida(verificarSeusuarioBateuPonto[0].ID_REGISTRO_PONTO);
                 if(retorno.status){
@@ -84,7 +110,7 @@ const registrarPonto = async (req, res) => {
         // verificação do turno noturno
         var verificarTurnoNoturno = await usuarioDAO.verificarTurnoNoturno(id_setor, id_turno, cod);
         console.log("aaa", verificarTurnoNoturno)
-        if(verificarTurnoNoturno.length > 0 && verificarTurnoNoturno.HORA_SAIDA != null){//Se o médico bateu algum ponto no turno/setor do dia anterior
+        if(verificarTurnoNoturno.length > 0 && verificarTurnoNoturno[0].HORA_SAIDA == null){//Se o médico bateu algum ponto no turno/setor do dia anterior
             //verificar o limite maximo de horas em um determinado turno
             var verificarLimiteHorasTurnos = await usuarioDAO.verificarLimiteHorasTurnos(id_turno);
             let temp = verificarLimiteHorasTurnos.HORAS.substr(11, 2)
@@ -95,9 +121,8 @@ const registrarPonto = async (req, res) => {
             let difAtualAnterior = parseInt(diferencaHorasBatidaAnteriorAtual.DIFERENCA.substr(11, 2))
 
             //verificar se a diferença para o dia anterior esta dentro do limite maximo estabelecido
-            console.log("limiteMaxTurno", limiteMaxTurno)// pode ser substituido por 7
+            console.log("limiteMaxTurno", limiteMaxTurno)
             console.log("difAtualAnterior", difAtualAnterior)
-
             if(difAtualAnterior < limiteMaxTurno){//Se limite de tempo da batida tiver dentro do limite do turno
                 //bater ponto saída
                 const retorno = await usuarioDAO.registrarPontoSaida(verificarTurnoNoturno[0].ID_REGISTRO_PONTO);
@@ -239,6 +264,20 @@ const deleteUsuario = async (req, res) => {
 };
 
 
+
+const getFolhaPonto = async (req, res) => {
+    const { mes, ano } = req.body;
+
+    const retorno = await usuarioDAO.getFolhaPonto(req.params.id, mes, ano);
+    
+    if(retorno.status){
+        return res.status(200).send(retorno);
+    }else{
+        return res.status(500).send(retorno);
+    }
+};
+
+
 module.exports = {
     login,
     registrarPonto,
@@ -247,4 +286,5 @@ module.exports = {
     getUsuario,
     getUsuarios,
     deleteUsuario,
+    getFolhaPonto
 };
