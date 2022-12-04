@@ -39,119 +39,17 @@ const registrarPonto = async (req, res) => {
             msg: 'Faltam parametros',
         });
     }
-    //verificar se a batida ta dentro do limite do turno (limite de 1h antes e 1h depois)
-    var verificarlimitesDoTurno = await usuarioDAO.verificarlimitesDoTurno(id_turno);
-    let hora_entra = parseInt(verificarlimitesDoTurno.HORA_ENTRADA)
-    let hora_saida = parseInt(verificarlimitesDoTurno.HORA_SAIDA)
-    let hora_atual = parseInt(verificarlimitesDoTurno.HORA_ATUAL)
-
-    if(hora_entra < hora_saida){//turno que começa e termina no mesmo dia
-        console.log("lim_hora_entra", hora_entra+1, "---", "lim_hora_saida", hora_saida-1)
-        if(hora_atual >= hora_entra-1 && hora_atual <= hora_saida+1){//Se tiver dentro do limite do turno
-        }else{
-            return res.status(200).send({"status": false, "msg": "Você não pode registrar ponto fora do horario limite definido para o turno!", "dados": []})
-        }
-    }else{//turno que começa em um dia e termina no outro
-        if(hora_atual >= hora_entra-1 || hora_atual <= hora_saida+1){//Se tiver dentro do limite do turno
-        }else{
-            return res.status(200).send({"status": false, "msg": "Você não pode registrar ponto fora do horario limite definido para o turno 2!", "dados": []})
-        }
-    }
-
     //verificar quantas batidas o usuario realizou no dia/setor/turno
     var verificarSeusuarioBateuPonto = await usuarioDAO.verificarSeusuarioBateuPonto(id_setor, id_turno, cod);
 
-    if(verificarSeusuarioBateuPonto.length > 0){
-        if(verificarSeusuarioBateuPonto[0].HORA_SAIDA){
-            return res.status(200).send({"status": false, "msg": "Você já atingiu o limite máximo de registro de pontos, para esse turno/setor, hoje", "dados": []});
-        }else{
-            //verificar o limite maximo de horas em um determinado turno
-            var verificarLimiteHorasTurnos = await usuarioDAO.verificarLimiteHorasTurnos(id_turno);
-            let temp = verificarLimiteHorasTurnos.HORAS.substr(11, 2)
-            let limiteMaxTurno = parseInt(temp) + 1;
+    // verificar a quantidade de horas do turno
+    var verificarQtdHorasTurno = await usuarioDAO.verificarQtdHorasTurno(id_turno);
+    let limite_do_turno = parseInt(verificarQtdHorasTurno.QTD_HORAS) + 2;
 
-            //calcular a diferença da batida anterior para a atual
-            var diferencaHorasBatidaAnteriorAtual = await usuarioDAO.diferencaHorasBatidaAnteriorAtualDia(id_setor, id_turno, cod);
-            difAtualAnterior = parseInt(diferencaHorasBatidaAnteriorAtual.DIFERENCA.substr(11, 2))
-
-            console.log("limiteMaxTurno>>", limiteMaxTurno)
-            console.log("difAtualAnterior>>", difAtualAnterior)
-
-            if(difAtualAnterior < limiteMaxTurno){//Se limite de tempo da batida tiver dentro do limite do turno
-                //bater ponto saída
-                const retorno = await usuarioDAO.registrarPontoSaida(verificarSeusuarioBateuPonto[0].ID_REGISTRO_PONTO);
-                if(retorno.status){
-                    return res.status(200).send(retorno);
-                }else{
-                    return res.status(500).send(retorno);
-                }
-            }else{//bater entrada no proximo turno
-                //verificar quantas vagas tem p esse turno/setor
-                var vagasTurnoSetor = await usuarioDAO.verificarVagasTurnoSetor(id_setor, id_turno);
-                var pontosBatidos = await usuarioDAO.verificarPontosBatidos(id_setor, id_turno);
-
-                if(vagasTurnoSetor.dados.length == 0){
-                    return res.status(200).send({"status": false, "msg": "Não existe escala para você nesse turno e nesse setor de atendimento!", "dados": []});
-                }
-
-                if(pontosBatidos < vagasTurnoSetor.dados[0].QTD_VAGAS){//realizar batida
-                    const retorno = await usuarioDAO.registrarPontoEntrada(cod, id_setor, id_turno, latitude, longitude, cpf);
-                    if(retorno.status){
-                        return res.status(200).send(retorno);
-                    }else{
-                        return res.status(500).send(retorno);
-                    }
-                }else{
-                    return res.status(200).send({"status": false, "msg": "Limite máximo de registros, definido para o turno, já foi atingido!", "dados": []});
-                }
-            }
-        }
-    }else{
-        // verificação do turno noturno
-        var verificarTurnoNoturno = await usuarioDAO.verificarTurnoNoturno(id_setor, id_turno, cod);
-        console.log("aaa", verificarTurnoNoturno)
-        if(verificarTurnoNoturno.length > 0 && verificarTurnoNoturno[0].HORA_SAIDA == null){//Se o médico bateu algum ponto no turno/setor do dia anterior
-            //verificar o limite maximo de horas em um determinado turno
-            var verificarLimiteHorasTurnos = await usuarioDAO.verificarLimiteHorasTurnos(id_turno);
-            let temp = verificarLimiteHorasTurnos.HORAS.substr(11, 2)
-            let limiteMaxTurno = parseInt(temp) + 1;
-
-            //calcular a diferença da batida anterior para a atual
-            var diferencaHorasBatidaAnteriorAtual = await usuarioDAO.diferencaHorasBatidaAnteriorAtual(id_setor, id_turno, cod);
-            let difAtualAnterior = parseInt(diferencaHorasBatidaAnteriorAtual.DIFERENCA.substr(11, 2))
-
-            //verificar se a diferença para o dia anterior esta dentro do limite maximo estabelecido
-            console.log("limiteMaxTurno", limiteMaxTurno)
-            console.log("difAtualAnterior", difAtualAnterior)
-            if(difAtualAnterior < limiteMaxTurno){//Se limite de tempo da batida tiver dentro do limite do turno
-                //bater ponto saída
-                const retorno = await usuarioDAO.registrarPontoSaida(verificarTurnoNoturno[0].ID_REGISTRO_PONTO);
-                if(retorno.status){
-                    return res.status(200).send(retorno);
-                }else{
-                    return res.status(500).send(retorno);
-                }
-            }else{//bater entrada no proximo turno
-                //verificar quantas vagas tem p esse turno/setor
-                var vagasTurnoSetor = await usuarioDAO.verificarVagasTurnoSetor(id_setor, id_turno);
-                var pontosBatidos = await usuarioDAO.verificarPontosBatidos(id_setor, id_turno);
-
-                if(vagasTurnoSetor.dados.length == 0){
-                    return res.status(200).send({"status": false, "msg": "Não existe escala para você nesse turno e nesse setor de atendimento!", "dados": []});
-                }
-
-                if(pontosBatidos < vagasTurnoSetor.dados[0].QTD_VAGAS){//realizar batida
-                    const retorno = await usuarioDAO.registrarPontoEntrada(cod, id_setor, id_turno, latitude, longitude, cpf);
-                    if(retorno.status){
-                        return res.status(200).send(retorno);
-                    }else{
-                        return res.status(500).send(retorno);
-                    }
-                }else{
-                    return res.status(200).send({"status": false, "msg": "Limite máximo de registros, definido para o turno, já foi atingido!", "dados": []});
-                }
-            }
-        }else{
+    if(verificarSeusuarioBateuPonto.length == 0){//Se não tiver batido nenhum ponto no turno/setor/dia
+        // verificar se exite ponto no dia anterior, cujo a diferença entre a entrada/hora atual, esta dentro do limite do turno + 2h
+        var verificarSeusuarioBateuPontoLimiteTurno = await usuarioDAO.verificarSeusuarioBateuPontoLimiteTurno(id_setor, id_turno, cod, limite_do_turno);
+        if(verificarSeusuarioBateuPontoLimiteTurno.length == 0){//Não existe ponto no dia anterior com saida pendente
             //verificar quantas vagas tem p esse turno/setor
             var vagasTurnoSetor = await usuarioDAO.verificarVagasTurnoSetor(id_setor, id_turno);
             var pontosBatidos = await usuarioDAO.verificarPontosBatidos(id_setor, id_turno);
@@ -160,7 +58,8 @@ const registrarPonto = async (req, res) => {
                 return res.status(200).send({"status": false, "msg": "Não existe escala para você nesse turno e nesse setor de atendimento!", "dados": []});
             }
 
-            if(pontosBatidos < vagasTurnoSetor.dados[0].QTD_VAGAS){//realizar batida
+            if(pontosBatidos < vagasTurnoSetor.dados[0].QTD_VAGAS){
+                //bater ponto entrada
                 const retorno = await usuarioDAO.registrarPontoEntrada(cod, id_setor, id_turno, latitude, longitude, cpf);
                 if(retorno.status){
                     return res.status(200).send(retorno);
@@ -170,7 +69,83 @@ const registrarPonto = async (req, res) => {
             }else{
                 return res.status(200).send({"status": false, "msg": "Limite máximo de registros, definido para o turno, já foi atingido!", "dados": []});
             }
+        }else{//Existe um ponto, dentro do limite do turno, com uma saída pendente
+            //bater ponto saída
+            const retorno = await usuarioDAO.registrarPontoSaida(verificarSeusuarioBateuPontoLimiteTurno[0].ID_REGISTRO_PONTO);
+            if(retorno.status){
+                return res.status(200).send(retorno);
+            }else{
+                return res.status(500).send(retorno);
+            }
         }
+    }
+
+    else if(verificarQtdHorasTurno.QTD_HORAS == 6 && verificarSeusuarioBateuPonto.length > 0 && verificarSeusuarioBateuPonto.length <= 3 ){// se for 6h, permitir, no máximo, 3 entradas por turno/setor/dia
+        if(verificarSeusuarioBateuPonto.length == 3 && verificarSeusuarioBateuPonto[0].HORA_SAIDA){
+            return res.status(200).send({"status": false, "msg": "Limite máximo de registros, definido para o turno, já foi atingido! Quatidade de horas do turno: " + verificarQtdHorasTurno.QTD_HORAS, "dados": []});
+        }
+        if(verificarSeusuarioBateuPonto[0].HORA_SAIDA){//Se a ultima batida do usuário tem uma saída
+            //bater ponto entrada
+            const retorno = await usuarioDAO.registrarPontoEntrada(cod, id_setor, id_turno, latitude, longitude, cpf);
+            if(retorno.status){
+                return res.status(200).send(retorno);
+            }else{
+                return res.status(500).send(retorno);
+            }
+        }else{//Se a ultima batida do usuário NÃO tem uma saída
+            if( verificarSeusuarioBateuPonto[0].HORA_DIFERENCA <= limite_do_turno){//Se tiver DENTRO do limite do turno
+                //bater ponto saída
+                const retorno = await usuarioDAO.registrarPontoSaida(verificarSeusuarioBateuPonto[0].ID_REGISTRO_PONTO);
+                if(retorno.status){
+                    return res.status(200).send(retorno);
+                }else{
+                    return res.status(500).send(retorno);
+                }
+            }else{//Se tiver FORA do limite do turno
+                //bater ponto entrada
+                const retorno = await usuarioDAO.registrarPontoEntrada(cod, id_setor, id_turno, latitude, longitude, cpf);
+                if(retorno.status){
+                    return res.status(200).send(retorno);
+                }else{
+                    return res.status(500).send(retorno);
+                }
+            }
+        }
+    }
+ 
+    else if(verificarQtdHorasTurno.QTD_HORAS == 12 && verificarSeusuarioBateuPonto.length > 0 && verificarSeusuarioBateuPonto.length <= 2  ){// se for 12h, permitir, no máximo, 2 entradas por turno/setor/dia
+        if(verificarSeusuarioBateuPonto.length == 2 && verificarSeusuarioBateuPonto[0].HORA_SAIDA){
+            return res.status(200).send({"status": false, "msg": "Limite máximo de registros, definido para o turno, já foi atingido! Quatidade de horas do turno: " + verificarQtdHorasTurno.QTD_HORAS, "dados": []});
+        }
+        if(verificarSeusuarioBateuPonto[0].HORA_SAIDA){//Se a ultima batida do usuário tem uma saída
+            //bater ponto entrada
+            const retorno = await usuarioDAO.registrarPontoEntrada(cod, id_setor, id_turno, latitude, longitude, cpf);
+            if(retorno.status){
+                return res.status(200).send(retorno);
+            }else{
+                return res.status(500).send(retorno);
+            }
+        }else{//Se a ultima batida do usuário NÃO tem uma saída
+            if( verificarSeusuarioBateuPonto[0].HORA_DIFERENCA <= limite_do_turno){//Se tiver DENTRO do limite do turno
+                //bater ponto saída
+                const retorno = await usuarioDAO.registrarPontoSaida(verificarSeusuarioBateuPonto[0].ID_REGISTRO_PONTO);
+                if(retorno.status){
+                    return res.status(200).send(retorno);
+                }else{
+                    return res.status(500).send(retorno);
+                }
+            }else{//Se tiver FORA do limite do turno
+                //bater ponto entrada
+                const retorno = await usuarioDAO.registrarPontoEntrada(cod, id_setor, id_turno, latitude, longitude, cpf);
+                if(retorno.status){
+                    return res.status(200).send(retorno);
+                }else{
+                    return res.status(500).send(retorno);
+                }
+            }
+        }
+    }else{
+        return res.status(200).send({"status": false, "msg": "Limite máximo de registros, definido para o turno, já foi atingido! Quatidade de horas do turno: " + verificarQtdHorasTurno.QTD_HORAS, "dados": []});    
     }
 };
 

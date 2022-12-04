@@ -134,16 +134,17 @@ async function verificarVagasTurnoSetor(id_setor, id_turno) {
 
 
 
-async function verificarTurnoNoturno(id_setor, id_turno, cod) {
+
+async function verificarSeusuarioBateuPonto(id_setor, id_turno, cod) {
     let retorno
 
     const db = await oracledb.getConnection();
-    await db.execute(`select * from samel.registro_ponto 
+    await db.execute(`select ((sysdate - cast(a.hora_entrada as date)) *24) hora_diferenca, a.* from samel.registro_ponto a
                         where 1 = 1
                             and id_setor = :id_setor
                             and id_turno = :id_turno
                             and id_profissional = :cod
-                            and trunc(hora_entrada) = trunc(sysdate-1)
+                            and trunc(hora_entrada) = trunc(sysdate)
                             order by id_registro_ponto desc
                     `,
         {
@@ -160,7 +161,7 @@ async function verificarTurnoNoturno(id_setor, id_turno, cod) {
         db.close();
     })
     .catch(err => {
-        console.log("Erro ao calcular diferença entre horas" + err);
+        console.log("Erro ao buscar pontos batidos" + err);
     });
 
     return retorno
@@ -168,119 +169,29 @@ async function verificarTurnoNoturno(id_setor, id_turno, cod) {
 
 
 
-async function verificarLimiteHorasTurnos(id_turno) {
+async function verificarSeusuarioBateuPontoLimiteTurno(id_setor, id_turno, cod, limite_do_turno) {
     let retorno
 
     const db = await oracledb.getConnection();
-    await db.execute(`select nome_turno, to_char(saida - entrada) as HORAS from samel.turno 
-                        where 1 = 1
-                        and id_turno = :id_turno
-                    `,
-        {
-            ':id_turno': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_turno)},
-        },
-        { outFormat: oracledb.OBJECT, autoCommit: true },
-    )
-    .then(result => {
-        retorno = result.rows[0];
-    })
-    .finally(function() {
-        db.close();
-    })
-    .catch(err => {
-        console.log("Erro ao calcular diferença entre horas do turno" + err);
-    });
-
-    return retorno
-}
-
-
-
-async function diferencaHorasBatidaAnteriorAtualDia(id_setor, id_turno, cod) {
-    let retorno
-
-    const db = await oracledb.getConnection();
-    await db.execute(`select to_char(sysdate - hora_entrada) as DIFERENCA from samel.registro_ponto 
-                        where 1 = 1
-                            and id_setor = :id_setor
-                            and id_turno = :id_turno
-                            and id_profissional = :cod
-                            and trunc(hora_entrada) = trunc(sysdate)
+    await db.execute(`select ((sysdate - cast(a.hora_entrada as date)) *24) as diferenca, a.* from samel.registro_ponto a
+                                    where 1 = 1
+                                        and id_setor = :id_setor
+                                        and id_turno = :id_turno
+                                        and id_profissional = :cod
+                                        and ((sysdate - cast(a.hora_entrada as date)) *24) <= :limite_do_turno
+                                        and hora_saida is null
+                                        order by id_registro_ponto desc
                     `,
         {
             ':id_setor': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_setor)},
             ':id_turno': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_turno)},
             ':cod': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(cod)},
+            ':limite_do_turno': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(limite_do_turno)},
         },
         { outFormat: oracledb.OBJECT, autoCommit: true },
     )
     .then(result => {
-        retorno = result.rows[0];
-    })
-    .finally(function() {
-        db.close();
-    })
-    .catch(err => {
-        console.log("Erro ao calcular diferença entre horas do turno" + err);
-    });
-
-    return retorno
-}
-
-
-
-async function diferencaHorasBatidaAnteriorAtual(id_setor, id_turno, cod) {
-    let retorno
-
-    const db = await oracledb.getConnection();
-    await db.execute(`select to_char(sysdate - hora_entrada) as DIFERENCA from samel.registro_ponto 
-                        where 1 = 1
-                            and id_setor = :id_setor
-                            and id_turno = :id_turno
-                            and id_profissional = :cod
-                            and trunc(hora_entrada) = trunc(sysdate-1)
-                            order by DIFERENCA asc
-                    `,
-        {
-            ':id_setor': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_setor)},
-            ':id_turno': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_turno)},
-            ':cod': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(cod)},
-        },
-        { outFormat: oracledb.OBJECT, autoCommit: true },
-    )
-    .then(result => {
-        retorno = result.rows[0];
-    })
-    .finally(function() {
-        db.close();
-    })
-    .catch(err => {
-        console.log("Erro ao calcular diferença entre horas do turno" + err);
-    });
-
-    return retorno
-}
-
-
-
-async function verificarlimitesDoTurno(id_turno) {
-    let retorno
-
-    const db = await oracledb.getConnection();
-    await db.execute(`select
-                        to_char(a.entrada, 'HH24') hora_entrada,
-                        to_char(a.saida, 'HH24') hora_saida,
-                        to_char(sysdate, 'HH24') as hora_atual,
-                        a.* 
-                        from samel.turno a where id_turno=:id_turno
-                    `,
-        {
-            ':id_turno': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_turno)},
-        },
-        { outFormat: oracledb.OBJECT, autoCommit: true },
-    )
-    .then(result => {
-        retorno = result.rows[0];
+        retorno = result.rows;
     })
     .finally(function() {
         db.close();
@@ -294,26 +205,19 @@ async function verificarlimitesDoTurno(id_turno) {
 
 
 
-async function verificarSeusuarioBateuPonto(id_setor, id_turno, cod) {
+async function verificarQtdHorasTurno(id_turno) {
     let retorno
 
     const db = await oracledb.getConnection();
-    await db.execute(`select * from samel.registro_ponto 
-                        where 1 = 1
-                            and id_setor = :id_setor
-                            and id_turno = :id_turno
-                            and id_profissional = :cod
-                            and trunc(hora_entrada) = trunc(sysdate)
+    await db.execute(`select qtd_horas from samel.turno where id_turno=:id_turno
                     `,
         {
-            ':id_setor': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_setor)},
             ':id_turno': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id_turno)},
-            ':cod': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(cod)},
         },
         { outFormat: oracledb.OBJECT, autoCommit: true },
     )
     .then(result => {
-        retorno = result.rows;
+        retorno = result.rows[0];
     })
     .finally(function() {
         db.close();
@@ -393,7 +297,7 @@ async function registrarPontoEntrada(cod, id_setor, id_turno, latitude, longitud
     )
     .then(result => {
         retorno.status = true;
-        retorno.msg = "Ponto registrado com sucesso!";
+        retorno.msg = "Ponto de entrada realizado com sucesso!";
     })
     .finally(function() {
         db.close();
@@ -428,7 +332,7 @@ async function registrarPontoSaida(cod) {
     )
     .then(result => {
         retorno.status = true;
-        retorno.msg = "Ponto registrado com sucesso!";
+        retorno.msg = "Ponto de saída realizado com sucesso!";
     })
     .finally(function() {
         db.close();
@@ -657,10 +561,17 @@ async function getFolhaPonto(id, mes, ano) {
     to_char(a.hora_entrada, 'HH24:MI') hora_entrada1,
     to_char(a.hora_saida, 'HH24:MI') hora_saida1,
     a.* 
-    FROM samel.registro_ponto a WHERE extract(month from hora_entrada) = :mes and extract (year from hora_entrada) = :ano`,
+    FROM 
+        samel.registro_ponto a WHERE 1=1 
+        and extract(month from hora_entrada) = :mes 
+        and extract (year from hora_entrada) = :ano
+        and id_profissional = :id
+        order by id_registro_ponto desc
+        `,
         {
             ':mes': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(mes)},
             ':ano': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(ano)},
+            ':id': { dir: oracledb.BIND_IN, type: oracledb.NUMBER, val: parseInt(id)},
         },
         { outFormat: oracledb.OBJECT, autoCommit: true },
     )
@@ -686,12 +597,9 @@ module.exports = {
     login,
     loginAdm,
     verificarVagasTurnoSetor,
-    verificarTurnoNoturno,
-    verificarLimiteHorasTurnos,
-    diferencaHorasBatidaAnteriorAtualDia,
-    diferencaHorasBatidaAnteriorAtual,
-    verificarlimitesDoTurno,
     verificarSeusuarioBateuPonto,
+    verificarSeusuarioBateuPontoLimiteTurno,
+    verificarQtdHorasTurno,
     verificarPontosBatidos,
     registrarPontoEntrada,
     registrarPontoSaida,
